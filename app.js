@@ -59,14 +59,19 @@ app.put("/update/:id", (req, res) => {
   const { id } = req.params;
   const { name, city } = req.body;
   const sql_base = "UPDATE customers SET";
-  let sql;
-  if (!name && city) {
-    sql = `${sql_base} city = '${city}}`;
-  } else if (name && !city) {
-    sql = `${sql_base} name = '${name}'`;
-  } else {
-    sql = `${sql_base} name = '${name}', city = '${city}}`;
+  let sql_props;
+  if (name && city) {
+    sql_props = `name = '${name}', city = '${city}}`;
   }
+  if (name) {
+    sql_props = `name = '${name}'`;
+  }
+  if (city) {
+    sql_props = `city = '${city}'`;
+  }
+  const sql_where = `WHERE id = ${id}`;
+  const sql = `${sql_base} ${sql_props} ${sql_where}`;
+
   connection.query(sql, (error) => {
     if (error) throw error;
     res.send("Customer updated");
